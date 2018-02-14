@@ -1,0 +1,170 @@
+dsSchool_python 기본문법
+17.11.19 
+> https://justpaste.it/1doe6
+
+python이랑 anaconda랑 충돌나도 딱히 큰 문제 없다심.
+view> toggle header> 창을 넓게 쓸 수 있음
+
+프밍 책 읽는 강사님의 노하우
+1. 책은 레퍼런스+학습지 반반
+2. 문법부터 익히자
+3. 당연히 2번만에 못 외우니, 정리 ㄱ
+
+좋은 개발자 노하우
+1. 에러나면 억지로라도 기뻐하라. 아~! ㅇㅇ 아씨 ㄴㄴ
+
+에러 풀이 노하우
+TypeError: unsupported operand type(s) for +: 'int' and 'str'
+- int 숫자, str 문자열
+- 코드보단 메시지부터. 맨 밑에부터 읽어봐라. 바로 그 윗줄 정에 모든 해결책이 있음
+- 메시지만으로 안 되면? 에러 메시지 복붙> 구글링
+  스스로 해결? ㄴㄴ
+
+> 문법
+- python에는 switch~case 가 없음
+- 문자열 "" '' 두 표현 있는 까닭- "'내'블라블라 "
+- 1+"2" > error. type 형변환 우선순위가 없나??
+- 문자열 안에 변수 넣고 싶은 경우
+bananas=5
+days=3
+"shayne ate {0}  bananas for {1} days".format(bananas,days)
+- (아직은) 중괄호- formatting 에서밖에 안 씀
+대괄호- 인덱싱, 리스트_배열
+소괄호- 나머지 다
+
+문자열
+- message="hello world"
+message
+message[0]
+message[-2]
+message[0:4] #'hell' [0,4) 이상~미만
+"H" in message
+"h" in message
+
+message.upper()
+message.lower()
+
+리스트
+odd=[1,3,5,7,9]
+odd[0]		# 1
+odd[-2]		# 7
+odd[1:-1]	# [3,5,7]
+
+odd.append(11)
+odd= odd+[13,15,17,19]
+odd[3]= 11
+odd[4]= -1
+
+문자열-> 리스트
+message= "Hello World!"
+print(message.split(" "))	# ['Hello', 'World!']
+print(message.split("o"))	# ['Hell', ' W', 'rld!']
+
+리스트-> 문자열
+words=["Hello","World!"]
+print(" ".join(words))	# Hello World!
+print(", ".join(words))	# Hello, World!
+print(",".join(words))	# Hello,World!
+
+제어문
+콜론 기준으로 띄어쓰기 함. 안하면 indentation error
+age= 5
+if age<5:
+    print("아이")
+else: 
+    print("애어른")
+
+기존 언어는 if랑 else만 있어도 if else 가 구현되는데
+if ~ else ~ if ,else
+콜론(:) 때문에 elif 를 하나 더 만들어줘야함 + 공백도 민감
+
+baskets= ['apple','banana','grape','dragonfruit']
+for stuff in baskets:
+    print(stuff)
+print("-----")
+stuff= baskets[0]
+print(stuff)
+stuff= baskets[1]
+print(stuff)
+stuff= baskets[2]
+print(stuff)
+stuff= baskets[3]
+print(stuff)
+
+for i in range(5):
+    print(i)
+
+for i in range(1,6):
+    print(i)
+
+for i in range(1,6):
+    if i==5:
+        break
+    print(i)
+
+for i in range(1,6):
+    if i==2:
+        continue
+    elif i==5:
+        break
+    print(i)
+
+
+#  0부터 10까지
+double_list=[]
+# ㄴㄴ for i in range(1,10):
+for i in range(1,11):
+#     if(i==5):  # 됨
+    if i==5:
+        continue
+    elif i==8:
+        break;
+    double= i*2
+#     ㄴㄴ double_list.append= double
+    double_list.append(double)
+
+# print(double_list) # 원하는대로 됨
+double_list
+
+함수
+
+#def. define
+def multiply(a,b):
+    print(a*b)
+multiply(2,1900000000000000000) # 에러안남
+multiply(-1,0.5)
+
+def sign(n):
+    if n<0:
+        print("음수")
+    elif n==0:
+        print("영")
+    else:
+        print("양수")
+
+sign(21)
+
+for n in [-1,0,+1]:
+    print(n)
+
+result= 1
+n=4
+for i in range(1,n):
+    result*= i
+#   ㄴㄴ  result*= n
+print(result)
+
+def factorial(n):
+    result= 1
+    for i in range(1,n+1):
+        result*= i
+    return result
+
+print(factorial(5))
+print(factorial(3))
+print(factorial(0))
+
+역순
+# ㄴㄴ for i in reversed(range(1,5)) 콜론 넣어야!
+for i in reversed(range(1,5)):
+    print(i)

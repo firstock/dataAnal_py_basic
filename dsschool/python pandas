@@ -1,0 +1,275 @@
+오늘 배운거, 기능별로 함수로 만들기!
+클래스도 있다던데?!
+
+171119
+구글::10 minutes to pandas- 2시간쯤 걸림
+https://pandas.pydata.org/pandas-docs/stable/10min.html
+> https://justpaste.it/1doe7
+
+너무 많아서 중간에 생략된 ... 데이터는 따로 보는 방법 X. 파일띄워보렴
+근데 엑셀은 100MB 넘어가면 버벅임
+pandas는 10GB도 OK
+
+pandas 지원 기능을 쓰면 내부적으로 C로 돌아감
+딴걸 쓰면 python 으로 돌아가서, 속도차이 발생
+
+원본을 건드리진 않음. 지금은 jupyter에서만
+나중에 다른이름으로 저장할 것
+
+[] 자주 쓰니, 타자 오류 주의
+
+import pandas as pd
+# train= pd.read_csv("data/train.csv")
+train= pd.read_csv("data/train.csv", index_col="PassengerId")
+#승객Id 기준으로 가져옴
+
+특정 행
+train.shape		# low col
+train.head()	# 앞에 행 5개만
+train.head(6)	# 앞에 행 6개만
+
+train["Survived"] # index랑 컬럼명 가져옴
+train[["Sex","Pclass","Survived"]].head(4)	#컬럼3개 한번에+ 행4개만. [[]]
+
+특정 열
+columns=["Sex","Pclass","Survived"] 	# [[]] 2개 의미: 리스트를 넣는 것
+train[columns]
+
+#loc. location. 해당 행에 무슨col, 무슨 값들있나 보기
+train.loc[1]
+train.loc[80:90] # [80,90] 이상~이하
+train.loc[[1,3,7,13]]	# 4명만 뽑음. 특정 승객
+
+특정 행&열
+train.loc[[1,3,5,7],["Pclass","Sex","Survived"]]
+
+PassangerId_1= [1,3,5,7]
+col_1= ["Pclass","Sex","Survived"]
+train.loc[PassangerId_1,col_1]
+
+색인 ●●●●
+train["Sex"]					# 값반환
+train["Sex"] =="male"			# T/F로 반환
+train[train["Sex"] =="male"]	# pandas [] 기능3. true
+
+pandas 특징
+[리스트] -> T/F 반환
+[boolean 개수==행 개수] -> true 인 것만 뽑음
+
+train["Embarked"].isin(["Q","S"])	# T/F 반환
+train[train["Embarked"].isin(["Q","S"])]	#T 인 행만 반환
+
+train[train["Ticket"].str.contains("STON")]	#문자열에 STON 포함된거 찾기
+#str.<<tab>> . python 도움말 안줌. pyCharm은 되나?
+
+#NaN. Not a number. null. 빈값 찾기
+train[train["Age"].isnull()]
+
+#NaN. Not a number. null. 빈값 아닌 것
+train[train["Age"].notnull()]
+train[~train["Age"].isnull()] # 물결~. T <-> F
+
+null조건을 행별로 넣
+#or => |. and => &
+#or로 하면 pandas 문법 때문에 안됨. 소괄호 넣어버릇해야 나중에 괜찮음
+train[(train["Age"].isnull()) | (train["Fare"].isnull())]
+
+#and => &
+train[(train["Age"].isnull()) & (train["Fare"].isnull())]
+
+
+기본연산
+# print(train["Fare"].mean) #이건 뭐 ??
+print(train["Fare"].mean()
+print(train["Age"].max())
+print(train["Age"].min())
+print(min.train["Age"])
+
+12:55
+
+응용
+
+컬럼 추가/삭제
+행 수가 같으면 어떻게든 들어감
+
+#0~890 숫자넣은 새 행 만듦
+train["Id"]= range(0,891)
+train
+
+#혼자 왔으면 1명
+train["FamilySize"]= train["SibSp"]+ train["Parch"]+ 1
+train[["SibSp","Parch","FamilySize"]]
+
+#C인 행을 T/F로 바꿈, S랑 Q가 있는걸 T/F로 바꿈
+train["Nationality_FR"]= train["Embarked"]=="C"
+train["Nationality_UK"]= train["Embarked"].isin(["S","Q"])
+
+train[["Embarked","Nationality_FR","Nationality_UK"]]
+
+# Embarked가 C인 행 중에서 Embarked 열만 보는 것
+train.loc[train["Embarked"]== "C","Embarked"]
+
+# ?????
+# Embarked가 C인 행, Natinality인 열을 뽑아서
+# UK를 넣음
+train.loc[train["Embarked"]== "C","Nationality"]="FR"
+train.loc[train["Embarked"].isin(["S","Q"]),"Nationality"]= "UK"
+
+train[["Embarked","Nationality"]]
+
+#운임이 30~100~ 인 열
+train["Fare_Cheap"]= train["Fare"]<30
+train["Fare_Medium"]= (train["Fare"]>=30) & (train["Fare"]<100)
+train["Fare_Expensive"]= train["Fare"]>= 100
+
+train[["Fare_Cheap", "Fare_Medium", "Fare_Expensive"]]
+
+
+# 나이대별로 AgeGen 행을 새로 만들어서 보여줌
+train.loc[train["Age"]<20,"AgeGen"]= "child"
+train.loc[(train["Age"]>=20) & (train["Age"]<50),"AgeGen"]= "adoloes"
+train.loc[train["Age"]>= 50,"AgeGen"]= "adult"
+
+train[["AgeGen"]]
+
+# Age의 행이 빈칸인걸 Age 열에 Age 평균값으로 채움
+age_mean= train["Age"].mean()
+train.loc[train["Age"].isnull(),"Age"]= age_mean
+train
+
+
+13:49
+titanic
+
+#train, test 데이터 로드. 2개만 보자
+# .shape 꼭 뽑아서, 지금 하는 게 train인지 test인지 체크!
+# 초기엔 출력 많이 뽑아보기!
+train= pd.read_csv("data/train.csv",index_col="PassengerId")
+print(train.shape)
+train.head(2)
+
+test= pd.read_csv("data/test.csv",index_col="PassengerId")
+print(test.shape)
+test.head(2)
+
+
+decision tree가 이해할 수 있도록 전처리(preprocessing)
+
+train.loc[train["Sex"]=="male","Sex"] =0
+train.loc[train["Sex"]=="female","Sex"] =1
+train[["Sex"]].head(5)
+
+test.loc[test["Sex"]=="male","Sex"] =0
+test.loc[test["Sex"]=="female","Sex"] =1
+test[["Sex"]].head(5)
+
+#test data에 빈값 채우기. 
+test[test["Fare"].isnull()] #빈 게 하나 밖에 없음
+
+test.loc[test["Fare"].isnull(),"Fare"]=0 #하나니까 그냥 0 넣
+test[test["Fare"].isnull()]
+
+
+Encode Embarked
+one-hot encoding. 1 만 핫함
+를 하지 않으면 decision tree가 오해함
+C S Q
+100
+010
+001
+
+TFF
+FTF
+FFT
+
+#train
+train["Embarked_C"]= train["Embarked"]=="C"
+train["Embarked_S"]= train["Embarked"]=="S"
+train["Embarked_Q"]= train["Embarked"]=="Q"
+
+print(train.shape)
+train[["Embarked_C","Embarked_S","Embarked_Q"]].head(4)
+
+#test
+test["Embarked_C"]= test["Embarked"]=="C"
+test["Embarked_S"]= test["Embarked"]=="S"
+test["Embarked_Q"]= test["Embarked"]=="Q"
+
+print(test.shape)
+train[["Embarked_C","Embarked_S","Embarked_Q"]]
+
+Embarked_C 	Embarked_S 	Embarked_Q
+PassengerId 			
+1 	False 	True 	False
+2 	True 	False 	False
+
+#함수화. ?아마? 될껄
+def testOneHot(colName1,colName2,colName3):
+    test["Embarked_"+colName1]= test["Embarked"]==colName1
+    test["Embarked_"+colName2]= test["Embarked"]==colName2
+    test["Embarked_"+colName3]= test["Embarked"]==colName3
+    test[["Embarked_C","Embarked_S","Embarked_Q"]].head(4)    
+
+testOneHot("C","S","Q")
+print(test.shape)
+
+train[["Embarked_C","Embarked_S","Embarked_Q"]]
+
+
+
+decision tree에 이걸 넣
+
+feature_names= ["Pclass","Sex","Fare","Embarked_C","Embarked_S","Embarked_Q"]
+feature_names
+
+X_train= train[feature_names]
+print(X_train.shape)
+X_train.head()
+
+X_test= test[feature_names]
+print(X_test.shape)
+X_test.head()
+
+label_name= "Survived"
+y_train= train[label_name]
+
+print(y_train.shape)
+y_train.head()
+
+
+pip install scikit-learn  #방대한 AI 라이브러리
+pip install scipy
+
+#lib 중에 tree만. 깊이는 최대 5
+from sklearn.tree import DecisionTreeClassifier
+model= DecisionTreeClassifier(max_depth=5)
+model
+
+model.fit(X_train, y_train)
+
+#X_test 모델로 예측
+predictions= model.predict(X_test)
+print(predictions.shape)
+predictions[0:10]
+
+
+제출
+파일 다운로드
+https://www.kaggle.com/c/titanic/data
+
+submit= pd.read_csv("data/gender_submission.csv",index_col="PassengerId")
+print(submit.shape)
+submit.head()
+
+submit["Survived"]= predictions
+print(submit.shape)
+submit.head()
+
+
+저장
+submit.to_csv("data/dicision-tree1.csv")
+
+kaggle에 제출
+https://www.kaggle.com/c/titanic/leaderboard
+원래- 0.78947 이 나와야 . 지금 무슨무슨 조건을 넣은거???. 13:49 이후 한것만
+나옴 ㅇㅇ

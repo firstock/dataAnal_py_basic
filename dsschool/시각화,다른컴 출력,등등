@@ -1,0 +1,63 @@
+https://justpaste.it/1e614
+
+dsschool 171203
+goo.gl/u3b1NF > 기본코드 공유. 0.43xxx (아마)
++ 월~일: one-hot > 0.42686 (cross값: 0.34769) 기준. (여기 참여자 상위 50% 안에 듦 ㅎ)
+- holiday, workingday: 0.46776( cross: 0.37698) 떨(떨)
++ holiday, workingday, season1, season2, season3, season4 -season: 0.43082 (cross: 0.34644) 떨(올)
+	> season을 on-hot 했더니 떨어지더라
+
+
+>> 오늘 1등: 0.420x
+- 일단 전부 one-hot encoding
+- 캐쥬얼, 레지> 각기 예측해서 2개를 test에 칼럼 추가
+<<
+
+>> 중급반 소개: 이쪽으로 진지하게 전향/이직/취업하고 싶다. 난이도 좀 있고, 회사에 쓰일법한거 많음
+- 현실 데이터: 비정형 데이터> 땡 텍스트. 텍스트 위주
+- 현장 개수 100MB~GB. 노트북에서 대용량을 효율적으로 다루는 방법
+입문반: 데분이 어려운 게 아니다. 과정 실습
+
+>> 딥러닝? 트렌드- 딥러닝 쓰냐 아니냐 O/X
+- X: 데분이.feature 중심
+- O: 영상/이미지/자연어 분야에서 특히 강력. 얘가 feature를 스스로 찾아줌. 대신, hyper parameter가 매우 까다로워서 
+
+>> 취업: 공고는 석사로 내지만, 공급이 절대적으로 딸려서 좀 알면 데려감
+- 딥러닝은 더욱 딸림. 막상 대학원가도 다 독학함.
+- 퀄리티는 보장함
+
+# model을 저장해서 다른 컴퓨터에서 출력할 수 있느냐
+#근데 pickle이 안 깔림 ;;;
+import pickle
+pickle.dump(model, open("random-forest.p"),"wb")
+
+월화수목금 / 토일
+을 따로 시각화하면 어떨까? - dayofweek
+
+월화수목금 12345? ㄴㄴ. 서로 독립적으로 해야할때>one-hot encoding
+
+
+windspeed 0으로 된 빈칸 채우기
+- notebook을 새로 만들어서 하는 게 낫다
+- X_train, X_test, y_train 관계
+	X_train, X_test의 feature_name: windspeed말고 다른걸로 (여기다 Survived 넣지 않는 것처럼). 여기다 뭘 넣을지는 또 고민해봐야
+	y_train의 label_name: windspeed
+
+>>>
+1회차
+
+2회차: 0.42686 (cross: 0.34769)
+feature_names = ["season", "holiday", "workingday", "weather", "temp", "atemp", "humidity", "windspeed", "datetime-year", "datetime-hour", "day_mon", "day_tue", "day_wed", "day_thi", "day_fri", "day_sat", "day_sun"]
+
+
+3회차: 0.46776 (cross: 0.37698)
+위 칼럼을 전부 시각화 해보니, holiday, workingday는 큰 차이 없더라
+feature_names = ["season", "weather", "temp", "atemp", "humidity", "windspeed", "datetime-year", "datetime-hour", "day_mon", "day_tue", "day_wed", "day_thi", "day_fri", "day_sat", "day_sun"]
+
+4회차:
+holiday, workingday 다시 넣고
+season은 one-hot이 좋을듯.
+feature_names = ["season1", "season2", "season3", "season4", "holiday", "workingday", "weather", "temp", "atemp", "humidity", "windspeed", "datetime-year", "datetime-hour", "day_mon", "day_tue", "day_wed", "day_thi", "day_fri", "day_sat", "day_sun"]
+
+5회차:
+windspeed 0값 채우기- train에서 0아닌값으로 추정

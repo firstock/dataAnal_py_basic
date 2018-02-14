@@ -1,0 +1,184 @@
+https://justpaste.it/1e616
+
+#####windspeed 예측하기?- 미완성
+
+import numpy as np
+import pandas as pd
+
+## Load Dataset
+
+train = pd.read_csv("data/train.csv", parse_dates=["datetime"])
+
+print(train.shape)
+train.head()
+
+test = pd.read_csv("data/test.csv", parse_dates=["datetime"])
+
+print(test.shape)
+test.head()
+
+## Preprocessing
+
+### Parse datetime
+
+train["datetime-year"] = train["datetime"].dt.year
+train["datetime-month"] = train["datetime"].dt.month
+train["datetime-day"] = train["datetime"].dt.day
+train["datetime-hour"] = train["datetime"].dt.hour
+train["datetime-minute"] = train["datetime"].dt.minute
+train["datetime-second"] = train["datetime"].dt.second
+train["datetime-dayofweek"] = train["datetime"].dt.dayofweek
+
+train["day_mon"]= train["datetime"].dt.dayofweek==0
+train["day_tue"]= train["datetime"].dt.dayofweek==1
+train["day_wed"]= train["datetime"].dt.dayofweek==2
+train["day_thi"]= train["datetime"].dt.dayofweek==3
+train["day_fri"]= train["datetime"].dt.dayofweek==4
+train["day_sat"]= train["datetime"].dt.dayofweek==5
+train["day_sun"]= train["datetime"].dt.dayofweek==6
+
+print(train.shape)
+train[["datetime", "datetime-year", "datetime-month", "datetime-day", "datetime-hour", "datetime-minute", "datetime-second", "datetime-dayofweek"]].head()
+
+test["datetime-year"] = test["datetime"].dt.year
+test["datetime-month"] = test["datetime"].dt.month
+test["datetime-day"] = test["datetime"].dt.day
+test["datetime-hour"] = test["datetime"].dt.hour
+test["datetime-minute"] = test["datetime"].dt.minute
+test["datetime-second"] = test["datetime"].dt.second
+
+#mon이 0 (아마도?)
+test["datetime-dayofweek"] = test["datetime"].dt.dayofweek
+test["day_mon"]= test["datetime"].dt.dayofweek==0
+test["day_tue"]= test["datetime"].dt.dayofweek==1
+test["day_wed"]= test["datetime"].dt.dayofweek==2
+test["day_thi"]= test["datetime"].dt.dayofweek==3
+test["day_fri"]= test["datetime"].dt.dayofweek==4
+test["day_sat"]= test["datetime"].dt.dayofweek==5
+test["day_sun"]= test["datetime"].dt.dayofweek==6
+
+
+print(test.shape)
+# test[["datetime", "datetime-year", "datetime-month", "datetime-day", "datetime-hour", "datetime-minute", "datetime-second", "datetime-dayofweek"]].head()
+# test[["day_mon", "day_tue", "day_wed", "day_thi", "day_fri", "day_sat", "day_sun"]]
+
+#### windspeed 0 or not0
+
+train_wd_not0= train[train["windspeed"]!=0]
+train_wd_not0.head()
+
+test_wd_not0= test[test["windspeed"]!=0]
+test_wd_not0.head()
+
+train_wd_0= train[train["windspeed"]==0]
+train_wd_0.head()
+
+test_wd_0= test[test["windspeed"]==0]
+test_wd_0.head()
+
+## Explore
+
+%matplotlib inline
+import seaborn as sns
+
+### datetime
+
+import matplotlib.pyplot as plt
+
+# figure, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(nrows=2, ncols=3)
+# figure.set_size_inches(18, 8)
+
+# sns.barplot(data=train, x="datetime-year", y="count", ax=ax1)
+# sns.barplot(data=train, x="datetime-month", y="count", ax=ax2)
+# sns.barplot(data=train, x="datetime-day", y="count", ax=ax3)
+# sns.barplot(data=train, x="datetime-hour", y="count", ax=ax4)
+# sns.barplot(data=train, x="datetime-minute", y="count", ax=ax5)
+# sns.barplot(data=train, x="datetime-second", y="count", ax=ax6)
+
+# int == integer == 숫자
+# str == string == 문자열
+train["datetime-year_month"] = train["datetime-year"].astype('str') + "-" + train["datetime-month"].astype('str')
+
+print(train.shape)
+train[["datetime", "datetime-year_month"]].head()
+
+## 모델링
+
+#### windspee 0/!0
+이를테면, datetime-hour로 예측해보자(뭐가 더 정확한지는 본판 고민하듯 해야할 부분 or 크게 괜찮아지는지 봐야 함)
+
+feature_names= ["datetime-hour"]
+X_train= train_wd_not0[feature_names]
+
+print(X_train.shape)
+
+X_test = train_wd_0[feature_names]
+
+print(X_test.shape)
+X_test.head()
+
+label_name = "windspeed"
+
+y_train = train_wd_not0[label_name]
+
+print(y_train.shape)
+y_train.head()
+
+### 나무 투표
+
+from sklearn.ensemble import RandomForestRegressor
+
+seed = 37
+
+model = RandomForestRegressor(random_state=seed)
+model
+
+** Score ** = Root Mean Squared Logarithmic Error, RMSLE.
+
+$$ \sqrt{\frac{1}{n} \sum_{i=1}^n (\log(p_i + 1) - \log(a_i+1))^2 } $$
+
+from sklearn.metrics import make_scorer
+
+def rmsle(predict, actual):
+    predict = np.array(predict)
+    actual = np.array(actual)
+    
+    log_predict = np.log(predict + 1)
+    log_actual = np.log(actual + 1)
+    
+    difference = log_predict - log_actual
+    square_difference = difference ** 2
+    mean_square_difference = square_difference.mean()
+    
+    score = np.sqrt(mean_square_difference)
+    
+    return score
+
+rmsle_score = make_scorer(rmsle)
+rmsle_score
+
+## Submit
+
+model.fit(X_train, y_train)
+
+predictions = model.predict(X_test)
+
+print(predictions.shape)
+# predictions[:3]
+predictions
+
+# predictions을 wind~~0 에 넣으면 되려나
+
+# 여기서 어떻게 하지??
+data/sampleSubmission 형식으로 넣는 건 아닐거 아냐
+
+# submission = pd.read_csv("data/sampleSubmissionWd.csv")
+
+# submission["windspeed"] = predictions
+
+# print(submission.shape)
+# submission.head()
+
+# submission.to_csv("result/fromTeach1203_wind.csv", index=False)
+
+predictions.to_csv("result/fromTeach1203_wind.csv", index=False)

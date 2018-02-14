@@ -1,0 +1,139 @@
+dsSchool 171126:: bikeShare
+오늘 팀점수: 0.52793
+
+>> decision tree 기본 원리
+
+decision tree를 내맘대로 쪼개기- 밴딩
+Gini Impunity(지니 불순도)= 1- P_survived^2 - P_사망^2
+
+ex1. 컬럼을 쪼갰는데, 한쪽은 다 죽고(perish) 나머지는 다 산 경우
+1- (0/100)^2- (100/100)^2 = 0  => 대단히 좋은 상황
+
+ex2. 컬럼을 쪼갰는데, 양쪽다 50명 살아 있음
+1- (50/100)^2- (50/100)^2= 0.5 => 매우 안 좋은 상황
+
+불순도 0~0.5
+
+- 모든 컬럼을 다~~~ 쪼개서 불순도가 더 이상 낮아지지 않을 때까지 or maxDepth에 다다를 때까지
+- 다 쪼개봤더니 성별 기준했을때 제일 낮아지더라
+
+
+
+0.4~0.9 권장
+
+1. 캐글 1위 자들 인터뷰: 처음 2~7일은 model을 만들지 않았다
+- 처음엔 엑셀& 시각화만 하면서 데이터를 완벽히 이해하고 시작
+
+2. feature_name는 많을 수록 좋은데, 일부것은 안 좋을 수도
+
+3. 일단 datetime을 쪼개서
+
+
+season 비슷
+workingday 유의미
+
+
+pandas에서 csv 파일 저장하기: train.to_csv("data/train_try3.csv", index=False)
+
+
+
+뭘해야 하나?
+0. 나중엔 건드릴게 너무 많아서, 건드리면 더 잘 오를거 같은걸 선순위로
+	a. one-hot encoding 했을 때 영향받는 게 전체 data 대비 얼마나 많을지 생각
+1. 빈값 찾기- tree추정으로 빈칸을 찾아서 그걸 다시 tree추정
+2. temp ~ atemp 차이
+3. 시간대별 정렬이니, temp 전후가 오른건지 떨어진건지
+
+오늘 팀점수: 0.52793
+
+오늘 1등 0.48472
+1. day of week
+2. datetime_hour
+n. random state_seed number 바꾸면?
+
+
+시각화- datetime (나머지 컬럼은 여러분 몫)
+## explore
+%matplotlib inline
+import seaborn as sns
+matplotlib 를 랩핑(보기 쉽게)
+
+import matplotlib.pyplot as plt
+맽플롯 과 씨본을 섞어 쓸 수 있음
+
+시각화 팁
+1. 하기전에 어떤 결과 나올지 상상해봐
+- 날짜가 19일까지 밖에?? > 20일 이후는 test.csv에만
+- train/ test 나누는 직간접적인 영향있는 data는 안 쓰는 게 좋음
+
+int2str > .astype('str')
+
+2. 회사가 성장해서 나날이 늘어난 것뿐
+- month는 그냥 빼버리는 게 낫다. 헷갈릴것도 없고, 점수 올리는데도 좋고
+
+3. 복잡하게 생각하지 마라
+- datetime_day랑 무엇무엇을 빼고 넣었더니 0.44123 나옴.  ㄷㄷㄷ.
+
+
+
+
+train["regBigger"]= train["casual"] < train["registered"]
+test["regBigger"]= test["casual"] < test["registered"]
+
+"regBigger"
+
+train["humidity10"]= floor(train["humidity"]/10)
+
+"weather_1", "weather_2", "weather_3", "weather_4"
+
+train["weather_1"]= (train["weather"]==1)
+train["weather_2"]= (train["weather"]==2)
+train["weather_3"]= (train["weather"]==3)
+train["weather_4"]= (train["weather"]==4)
+
+test["weather_1"]= (test["weather"]==1)
+test["weather_2"]= (test["weather"]==2)
+test["weather_3"]= (test["weather"]==3)
+test["weather_4"]= (test["weather"]==4)
+
+
+
+train.loc[train["weather"].isin([1,2]),"weather12"]= 1
+train.loc[train["weather"].isin([3,4]),"weather34"]= 0
+
+test.loc[test["weather"].isin([1,2]),"weather12"]= 1
+test.loc[test["weather"].isin([3,4]),"weather34"]= 0
+
+
+
+
+train["atemp_LL"]= (train["atemp"]<10)
+train["atemp_L"]= ((train["atemp"]>=10) & (train["atemp"]<20))
+train["atemp_M"]= ((train["atemp"]>=20) & (train["atemp"]<30))
+train["atemp_H"]= ((train["atemp"]>=30) & (train["atemp"]<40))
+train["atemp_HH"]= (train["atemp"]>=40)
+
+test["atemp_LL"]= (test["atemp"]<10)
+test["atemp_L"]= ((test["atemp"]>=10) & (test["atemp"]<20))
+test["atemp_M"]= ((test["atemp"]>=20) & (test["atemp"]<30))
+test["atemp_H"]= ((test["atemp"]>=30) & (test["atemp"]<40))
+test["atemp_HH"]= (test["atemp"]>=40)
+
+
+
+train["datetime_Y"] = train["datetime"].dt.year
+train["datetime_M"] = train["datetime"].dt.month
+train["datetime_D"] = train["datetime"].dt.day
+train["datetime_h"] = train["datetime"].dt.hour
+train["datetime_m"] = train["datetime"].dt.minute
+train["datetime_s"] = train["datetime"].dt.second
+
+
+["datetime_Y", "datetime_M","datetime_D","datetime_h","datetime_m","datetime_s", "atemp_LL","atemp_L","atemp_M","atemp_H","atemp_HH"]
+
+
+train["windspeed_LL"]= (train["windspeed"]<10)
+train["windspeed_L"]= ((train["windspeed"]>=10) & (train["windspeed"]<20))
+train["windspeed_M"]= ((train["windspeed"]>=20) & (train["windspeed"]<30))
+train["windspeed_H"]= ((train["windspeed"]>=30) & (train["windspeed"]<40))
+train["windspeed_HH"]= (train["windspeed"]>=40)

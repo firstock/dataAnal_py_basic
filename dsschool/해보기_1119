@@ -1,0 +1,68 @@
+해보기
+171119
+> 내가 추가로 해본 거
+
+#Age 빈칸인 행 중, Survived 열 보기
+train.loc[train["Age"].isnull(),"Survived"]
+
+#나이불명 OR 임금모름 인, 사람의 이름
+isNullAge= (train["Age"].isnull())
+isNullFare= (train["Fare"].isnull())
+train.loc[ isNullAge | isNullFare,"Name"]
+
+# data파일의 특정 열의 정보
+def show_info(dataset,col):
+    print("mean: ",dataset[col].mean())
+    print("count: ",dataset[col].count())
+    print("min: ",dataset[col].min())
+    print("max: ",dataset[col].max())
+    print("")
+show_info(test,"Age")
+show_info(train,"Age")
+
+## class로 만들기1
+class ColsTouch:
+    def __init__(self):  #생성자? 겸 내부참조
+        self.result= 0
+    def adder(self,num): # for test
+        self.result+= num
+        return self.result
+    
+class ColsTouch:
+    def __init__(self):  #생성자? 겸 내부참조
+        self.result= 0
+    def adder(self,num): # for test
+        self.result+= num
+        return self.result
+    
+    # @use ct.show_info(dataset, col)
+    def show_info(self, dataset=test, col="Fare"):
+#     @staticmethod
+#     def show_info(dataset,col):
+        print("shape:",dataset.shape)
+        print("mean: ",dataset[col].mean())
+        print("count: ",dataset[col].count())
+        print("min: ",dataset[col].min())
+        print("max: ",dataset[col].max())
+        print("")
+
+    def colAdd(self, dataset):
+        cnt= dataset["Survived"].count()  #총 행 수
+        dataset["Id"]= range(0,cnt) #[0,cnt)
+
+# 얜 한번만 실행
+ct= ColsTouch()
+
+# == PrePrecessing.adder(ct, 3)
+print(ct.adder(3))
+
+# == ColsTouch.show_info(ct, train, "Age)
+print(ct.show_info(train,"Age"))
+# ColsTouch.show_info(train,"Age")
+
+ct.show_info(test)	#col default: Fare
+ct.show_info()		#dataset default: test
+
+
+ct.colAdd(train)
+print(train["Id"].head())
