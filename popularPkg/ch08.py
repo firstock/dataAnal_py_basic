@@ -1,598 +1,520 @@
 
 # coding: utf-8
 
-# # Data Wrangling: Join, Combine, 
+# # Plotting and Visualization
 
 # In[ ]:
 
 
 import numpy as np
 import pandas as pd
+PREVIOUS_MAX_ROWS = pd.options.display.max_rows
 pd.options.display.max_rows = 20
 np.random.seed(12345)
 import matplotlib.pyplot as plt
+import matplotlib
 plt.rc('figure', figsize=(10, 6))
 np.set_printoptions(precision=4, suppress=True)
 
 
-# ## Hierarchical Indexing
+# %matplotlib notebook
+
+# ## A Brief matplotlib API Primer
 
 # In[ ]:
 
 
-data = pd.Series(np.random.randn(9),
-                 index=[['a', 'a', 'a', 'b', 'b', 'c', 'c', 'd', 'd'],
-                        [1, 2, 3, 1, 3, 1, 2, 2, 3]])
+import matplotlib.pyplot as plt
+
+
+# In[ ]:
+
+
+import numpy as np
+data = np.arange(10)
 data
+plt.plot(data)
+
+
+# ### Figures and Subplots
+
+# In[ ]:
+
+
+fig = plt.figure()
 
 
 # In[ ]:
 
 
-data.index
+ax1 = fig.add_subplot(2, 2, 1)
 
 
 # In[ ]:
 
 
-data['b']
-data['b':'c']
-data.loc[['b', 'd']]
+ax2 = fig.add_subplot(2, 2, 2)
+ax3 = fig.add_subplot(2, 2, 3)
+
+
+# fig = plt.figure()
+# ax1 = fig.add_subplot(2, 2, 1)
+# ax2 = fig.add_subplot(2, 2, 2)
+# ax3 = fig.add_subplot(2, 2, 3)
+
+# In[ ]:
+
+
+plt.plot(np.random.randn(50).cumsum(), 'k--')
 
 
 # In[ ]:
 
 
-data.loc[:, 2]
+_ = ax1.hist(np.random.randn(100), bins=20, color='k', alpha=0.3)
+ax2.scatter(np.arange(30), np.arange(30) + 3 * np.random.randn(30))
 
 
 # In[ ]:
 
 
-data.unstack()
+plt.close('all')
 
 
 # In[ ]:
 
 
-data.unstack().stack()
+fig, axes = plt.subplots(2, 3)
+axes
+
+
+# #### Adjusting the spacing around subplots
+
+# subplots_adjust(left=None, bottom=None, right=None, top=None,
+#                 wspace=None, hspace=None)
+
+# fig, axes = plt.subplots(2, 2, sharex=True, sharey=True)
+# for i in range(2):
+#     for j in range(2):
+#         axes[i, j].hist(np.random.randn(500), bins=50, color='k', alpha=0.5)
+# plt.subplots_adjust(wspace=0, hspace=0)
+
+# In[ ]:
+
+
+fig, axes = plt.subplots(2, 2, sharex=True, sharey=True)
+for i in range(2):
+    for j in range(2):
+        axes[i, j].hist(np.random.randn(500), bins=50, color='k', alpha=0.5)
+plt.subplots_adjust(wspace=0, hspace=0)
+
+
+# ### Colors, Markers, and Line Styles
+
+# ax.plot(x, y, 'g--')
+
+# ax.plot(x, y, linestyle='--', color='g')
+
+# In[ ]:
+
+
+plt.figure()
 
 
 # In[ ]:
 
 
-frame = pd.DataFrame(np.arange(12).reshape((4, 3)),
-                     index=[['a', 'a', 'b', 'b'], [1, 2, 1, 2]],
-                     columns=[['Ohio', 'Ohio', 'Colorado'],
-                              ['Green', 'Red', 'Green']])
-frame
+from numpy.random import randn
+plt.plot(randn(30).cumsum(), 'ko--')
+
+
+# plot(randn(30).cumsum(), color='k', linestyle='dashed', marker='o')
+
+# In[ ]:
+
+
+plt.close('all')
 
 
 # In[ ]:
 
 
-frame.index.names = ['key1', 'key2']
-frame.columns.names = ['state', 'color']
-frame
+data = np.random.randn(30).cumsum()
+plt.plot(data, 'k--', label='Default')
+plt.plot(data, 'k-', drawstyle='steps-post', label='steps-post')
+plt.legend(loc='best')
+
+
+# ### Ticks, Labels, and Legends
+
+# #### Setting the title, axis labels, ticks, and ticklabels
+
+# In[ ]:
+
+
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+ax.plot(np.random.randn(1000).cumsum())
 
 
 # In[ ]:
 
 
-frame['Ohio']
-
-
-# MultiIndex.from_arrays([['Ohio', 'Ohio', 'Colorado'], ['Green', 'Red', 'Green']],
-#                        names=['state', 'color'])
-
-# ### Reordering and Sorting Levels
-
-# In[ ]:
-
-
-frame.swaplevel('key1', 'key2')
+ticks = ax.set_xticks([0, 250, 500, 750, 1000])
+labels = ax.set_xticklabels(['one', 'two', 'three', 'four', 'five'],
+                            rotation=30, fontsize='small')
 
 
 # In[ ]:
 
 
-frame.sort_index(level=1)
-frame.swaplevel(0, 1).sort_index(level=0)
+ax.set_title('My first matplotlib plot')
+ax.set_xlabel('Stages')
 
 
-# ### Summary Statistics by Level
+# props = {
+#     'title': 'My first matplotlib plot',
+#     'xlabel': 'Stages'
+# }
+# ax.set(**props)
 
-# In[ ]:
-
-
-frame.sum(level='key2')
-frame.sum(level='color', axis=1)
-
-
-# ### Indexing with a DataFrame's columns
+# #### Adding legends
 
 # In[ ]:
 
 
-frame = pd.DataFrame({'a': range(7), 'b': range(7, 0, -1),
-                      'c': ['one', 'one', 'one', 'two', 'two',
-                            'two', 'two'],
-                      'd': [0, 1, 2, 0, 1, 2, 3]})
-frame
-
-
-# In[ ]:
-
-
-frame2 = frame.set_index(['c', 'd'])
-frame2
+from numpy.random import randn
+fig = plt.figure(); ax = fig.add_subplot(1, 1, 1)
+ax.plot(randn(1000).cumsum(), 'k', label='one')
+ax.plot(randn(1000).cumsum(), 'k--', label='two')
+ax.plot(randn(1000).cumsum(), 'k.', label='three')
 
 
 # In[ ]:
 
 
-frame.set_index(['c', 'd'], drop=False)
+ax.legend(loc='best')
+
+
+# ### Annotations and Drawing on a Subplot
+
+# ax.text(x, y, 'Hello world!',
+#         family='monospace', fontsize=10)
+
+# In[ ]:
+
+
+from datetime import datetime
+
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+
+data = pd.read_csv('examples/spx.csv', index_col=0, parse_dates=True)
+spx = data['SPX']
+
+spx.plot(ax=ax, style='k-')
+
+crisis_data = [
+    (datetime(2007, 10, 11), 'Peak of bull market'),
+    (datetime(2008, 3, 12), 'Bear Stearns Fails'),
+    (datetime(2008, 9, 15), 'Lehman Bankruptcy')
+]
+
+for date, label in crisis_data:
+    ax.annotate(label, xy=(date, spx.asof(date) + 75),
+                xytext=(date, spx.asof(date) + 225),
+                arrowprops=dict(facecolor='black', headwidth=4, width=2,
+                                headlength=4),
+                horizontalalignment='left', verticalalignment='top')
+
+# Zoom in on 2007-2010
+ax.set_xlim(['1/1/2007', '1/1/2011'])
+ax.set_ylim([600, 1800])
+
+ax.set_title('Important dates in the 2008-2009 financial crisis')
 
 
 # In[ ]:
 
 
-frame2.reset_index()
+ax.set_title('Important dates in the 2008–2009 financial crisis')
 
 
-# ## Combining and Merging Datasets
-
-# ### Database-Style DataFrame Joins
-
-# In[ ]:
-
-
-df1 = pd.DataFrame({'key': ['b', 'b', 'a', 'c', 'a', 'a', 'b'],
-                    'data1': range(7)})
-df2 = pd.DataFrame({'key': ['a', 'b', 'd'],
-                    'data2': range(3)})
-df1
-df2
-
+# fig = plt.figure()
+# ax = fig.add_subplot(1, 1, 1)
+# 
+# rect = plt.Rectangle((0.2, 0.75), 0.4, 0.15, color='k', alpha=0.3)
+# circ = plt.Circle((0.7, 0.2), 0.15, color='b', alpha=0.3)
+# pgon = plt.Polygon([[0.15, 0.15], [0.35, 0.4], [0.2, 0.6]],
+#                    color='g', alpha=0.5)
+# 
+# ax.add_patch(rect)
+# ax.add_patch(circ)
+# ax.add_patch(pgon)
 
 # In[ ]:
 
 
-pd.merge(df1, df2)
+fig = plt.figure(figsize=(12, 6)); ax = fig.add_subplot(1, 1, 1)
+rect = plt.Rectangle((0.2, 0.75), 0.4, 0.15, color='k', alpha=0.3)
+circ = plt.Circle((0.7, 0.2), 0.15, color='b', alpha=0.3)
+pgon = plt.Polygon([[0.15, 0.15], [0.35, 0.4], [0.2, 0.6]],
+                   color='g', alpha=0.5)
+ax.add_patch(rect)
+ax.add_patch(circ)
+ax.add_patch(pgon)
 
 
-# In[ ]:
+# ### Saving Plots to File
 
+# plt.savefig('figpath.svg')
 
-pd.merge(df1, df2, on='key')
+# plt.savefig('figpath.png', dpi=400, bbox_inches='tight')
 
+# from io import BytesIO
+# buffer = BytesIO()
+# plt.savefig(buffer)
+# plot_data = buffer.getvalue()
 
-# In[ ]:
+# ### matplotlib Configuration
 
+# plt.rc('figure', figsize=(10, 10))
 
-df3 = pd.DataFrame({'lkey': ['b', 'b', 'a', 'c', 'a', 'a', 'b'],
-                    'data1': range(7)})
-df4 = pd.DataFrame({'rkey': ['a', 'b', 'd'],
-                    'data2': range(3)})
-pd.merge(df3, df4, left_on='lkey', right_on='rkey')
+# font_options = {'family' : 'monospace',
+#                 'weight' : 'bold',
+#                 'size'   : 'small'}
+# plt.rc('font', **font_options)
 
+# ## Plotting with pandas and seaborn
 
-# In[ ]:
-
-
-pd.merge(df1, df2, how='outer')
-
-
-# In[ ]:
-
-
-df1 = pd.DataFrame({'key': ['b', 'b', 'a', 'c', 'a', 'b'],
-                    'data1': range(6)})
-df2 = pd.DataFrame({'key': ['a', 'b', 'a', 'b', 'd'],
-                    'data2': range(5)})
-df1
-df2
-pd.merge(df1, df2, on='key', how='left')
-
+# ### Line Plots
 
 # In[ ]:
 
 
-pd.merge(df1, df2, how='inner')
+plt.close('all')
 
 
 # In[ ]:
 
 
-left = pd.DataFrame({'key1': ['foo', 'foo', 'bar'],
-                     'key2': ['one', 'two', 'one'],
-                     'lval': [1, 2, 3]})
-right = pd.DataFrame({'key1': ['foo', 'foo', 'bar', 'bar'],
-                      'key2': ['one', 'one', 'one', 'two'],
-                      'rval': [4, 5, 6, 7]})
-pd.merge(left, right, on=['key1', 'key2'], how='outer')
+s = pd.Series(np.random.randn(10).cumsum(), index=np.arange(0, 100, 10))
+s.plot()
 
 
 # In[ ]:
 
 
-pd.merge(left, right, on='key1')
-pd.merge(left, right, on='key1', suffixes=('_left', '_right'))
+df = pd.DataFrame(np.random.randn(10, 4).cumsum(0),
+                  columns=['A', 'B', 'C', 'D'],
+                  index=np.arange(0, 100, 10))
+df.plot()
 
 
-# ### Merging on Index
-
-# In[ ]:
-
-
-left1 = pd.DataFrame({'key': ['a', 'b', 'a', 'a', 'b', 'c'],
-                      'value': range(6)})
-right1 = pd.DataFrame({'group_val': [3.5, 7]}, index=['a', 'b'])
-left1
-right1
-pd.merge(left1, right1, left_on='key', right_index=True)
-
+# ### Bar Plots
 
 # In[ ]:
 
 
-pd.merge(left1, right1, left_on='key', right_index=True, how='outer')
+fig, axes = plt.subplots(2, 1)
+data = pd.Series(np.random.rand(16), index=list('abcdefghijklmnop'))
+data.plot.bar(ax=axes[0], color='k', alpha=0.7)
+data.plot.barh(ax=axes[1], color='k', alpha=0.7)
 
 
 # In[ ]:
 
 
-lefth = pd.DataFrame({'key1': ['Ohio', 'Ohio', 'Ohio',
-                               'Nevada', 'Nevada'],
-                      'key2': [2000, 2001, 2002, 2001, 2002],
-                      'data': np.arange(5.)})
-righth = pd.DataFrame(np.arange(12).reshape((6, 2)),
-                      index=[['Nevada', 'Nevada', 'Ohio', 'Ohio',
-                              'Ohio', 'Ohio'],
-                             [2001, 2000, 2000, 2000, 2001, 2002]],
-                      columns=['event1', 'event2'])
-lefth
-righth
+np.random.seed(12348)
 
 
 # In[ ]:
 
 
-pd.merge(lefth, righth, left_on=['key1', 'key2'], right_index=True)
-pd.merge(lefth, righth, left_on=['key1', 'key2'],
-         right_index=True, how='outer')
-
-
-# In[ ]:
-
-
-left2 = pd.DataFrame([[1., 2.], [3., 4.], [5., 6.]],
-                     index=['a', 'c', 'e'],
-                     columns=['Ohio', 'Nevada'])
-right2 = pd.DataFrame([[7., 8.], [9., 10.], [11., 12.], [13, 14]],
-                      index=['b', 'c', 'd', 'e'],
-                      columns=['Missouri', 'Alabama'])
-left2
-right2
-pd.merge(left2, right2, how='outer', left_index=True, right_index=True)
-
-
-# In[ ]:
-
-
-left2.join(right2, how='outer')
-
-
-# In[ ]:
-
-
-left1.join(right1, on='key')
-
-
-# In[ ]:
-
-
-another = pd.DataFrame([[7., 8.], [9., 10.], [11., 12.], [16., 17.]],
-                       index=['a', 'c', 'e', 'f'],
-                       columns=['New York', 'Oregon'])
-another
-left2.join([right2, another])
-left2.join([right2, another], how='outer')
-
-
-# ### Concatenating Along an Axis
-
-# In[ ]:
-
-
-arr = np.arange(12).reshape((3, 4))
-arr
-np.concatenate([arr, arr], axis=1)
-
-
-# In[ ]:
-
-
-s1 = pd.Series([0, 1], index=['a', 'b'])
-s2 = pd.Series([2, 3, 4], index=['c', 'd', 'e'])
-s3 = pd.Series([5, 6], index=['f', 'g'])
-
-
-# In[ ]:
-
-
-pd.concat([s1, s2, s3])
-
-
-# In[ ]:
-
-
-pd.concat([s1, s2, s3], axis=1)
-
-
-# In[ ]:
-
-
-s4 = pd.concat([s1, s3])
-s4
-pd.concat([s1, s4], axis=1)
-pd.concat([s1, s4], axis=1, join='inner')
-
-
-# In[ ]:
-
-
-pd.concat([s1, s4], axis=1, join_axes=[['a', 'c', 'b', 'e']])
-
-
-# In[ ]:
-
-
-result = pd.concat([s1, s1, s3], keys=['one', 'two', 'three'])
-result
-result.unstack()
-
-
-# In[ ]:
-
-
-pd.concat([s1, s2, s3], axis=1, keys=['one', 'two', 'three'])
-
-
-# In[ ]:
-
-
-df1 = pd.DataFrame(np.arange(6).reshape(3, 2), index=['a', 'b', 'c'],
-                   columns=['one', 'two'])
-df2 = pd.DataFrame(5 + np.arange(4).reshape(2, 2), index=['a', 'c'],
-                   columns=['three', 'four'])
-df1
-df2
-pd.concat([df1, df2], axis=1, keys=['level1', 'level2'])
-
-
-# In[ ]:
-
-
-pd.concat({'level1': df1, 'level2': df2}, axis=1)
-
-
-# In[ ]:
-
-
-pd.concat([df1, df2], axis=1, keys=['level1', 'level2'],
-          names=['upper', 'lower'])
-
-
-# In[ ]:
-
-
-df1 = pd.DataFrame(np.random.randn(3, 4), columns=['a', 'b', 'c', 'd'])
-df2 = pd.DataFrame(np.random.randn(2, 3), columns=['b', 'd', 'a'])
-df1
-df2
-
-
-# In[ ]:
-
-
-pd.concat([df1, df2], ignore_index=True)
-
-
-# ### Combining Data with Overlap
-
-# In[ ]:
-
-
-a = pd.Series([np.nan, 2.5, np.nan, 3.5, 4.5, np.nan],
-              index=['f', 'e', 'd', 'c', 'b', 'a'])
-b = pd.Series(np.arange(len(a), dtype=np.float64),
-              index=['f', 'e', 'd', 'c', 'b', 'a'])
-b[-1] = np.nan
-a
-b
-np.where(pd.isnull(a), b, a)
-
-
-# In[ ]:
-
-
-b[:-2].combine_first(a[2:])
-
-
-# In[ ]:
-
-
-df1 = pd.DataFrame({'a': [1., np.nan, 5., np.nan],
-                    'b': [np.nan, 2., np.nan, 6.],
-                    'c': range(2, 18, 4)})
-df2 = pd.DataFrame({'a': [5., 4., np.nan, 3., 7.],
-                    'b': [np.nan, 3., 4., 6., 8.]})
-df1
-df2
-df1.combine_first(df2)
-
-
-# ## Reshaping and Pivoting
-
-# ### Reshaping with Hierarchical Indexing
-
-# In[ ]:
-
-
-data = pd.DataFrame(np.arange(6).reshape((2, 3)),
-                    index=pd.Index(['Ohio', 'Colorado'], name='state'),
-                    columns=pd.Index(['one', 'two', 'three'],
-                    name='number'))
-data
-
-
-# In[ ]:
-
-
-result = data.stack()
-result
-
-
-# In[ ]:
-
-
-result.unstack()
-
-
-# In[ ]:
-
-
-result.unstack(0)
-result.unstack('state')
-
-
-# In[ ]:
-
-
-s1 = pd.Series([0, 1, 2, 3], index=['a', 'b', 'c', 'd'])
-s2 = pd.Series([4, 5, 6], index=['c', 'd', 'e'])
-data2 = pd.concat([s1, s2], keys=['one', 'two'])
-data2
-data2.unstack()
-
-
-# In[ ]:
-
-
-data2.unstack()
-data2.unstack().stack()
-data2.unstack().stack(dropna=False)
-
-
-# In[ ]:
-
-
-df = pd.DataFrame({'left': result, 'right': result + 5},
-                  columns=pd.Index(['left', 'right'], name='side'))
+df = pd.DataFrame(np.random.rand(6, 4),
+                  index=['one', 'two', 'three', 'four', 'five', 'six'],
+                  columns=pd.Index(['A', 'B', 'C', 'D'], name='Genus'))
 df
-df.unstack('state')
+df.plot.bar()
 
 
 # In[ ]:
 
 
-df.unstack('state').stack('side')
-
-
-# ### Pivoting “Long” to “Wide” Format
-
-# In[ ]:
-
-
-data = pd.read_csv('examples/macrodata.csv')
-data.head()
-periods = pd.PeriodIndex(year=data.year, quarter=data.quarter,
-                         name='date')
-columns = pd.Index(['realgdp', 'infl', 'unemp'], name='item')
-data = data.reindex(columns=columns)
-data.index = periods.to_timestamp('D', 'end')
-ldata = data.stack().reset_index().rename(columns={0: 'value'})
+plt.figure()
 
 
 # In[ ]:
 
 
-ldata[:10]
+df.plot.barh(stacked=True, alpha=0.5)
 
 
 # In[ ]:
 
 
-pivoted = ldata.pivot('date', 'item', 'value')
-pivoted
+plt.close('all')
 
 
 # In[ ]:
 
 
-ldata['value2'] = np.random.randn(len(ldata))
-ldata[:10]
+tips = pd.read_csv('examples/tips.csv')
+party_counts = pd.crosstab(tips['day'], tips['size'])
+party_counts
+# Not many 1- and 6-person parties
+party_counts = party_counts.loc[:, 2:5]
 
 
 # In[ ]:
 
 
-pivoted = ldata.pivot('date', 'item')
-pivoted[:5]
-pivoted['value'][:5]
+# Normalize to sum to 1
+party_pcts = party_counts.div(party_counts.sum(1), axis=0)
+party_pcts
+party_pcts.plot.bar()
 
 
 # In[ ]:
 
 
-unstacked = ldata.set_index(['date', 'item']).unstack('item')
-unstacked[:7]
-
-
-# ### Pivoting “Wide” to “Long” Format
-
-# In[ ]:
-
-
-df = pd.DataFrame({'key': ['foo', 'bar', 'baz'],
-                   'A': [1, 2, 3],
-                   'B': [4, 5, 6],
-                   'C': [7, 8, 9]})
-df
+plt.close('all')
 
 
 # In[ ]:
 
 
-melted = pd.melt(df, ['key'])
-melted
+import seaborn as sns
+tips['tip_pct'] = tips['tip'] / (tips['total_bill'] - tips['tip'])
+tips.head()
+sns.barplot(x='tip_pct', y='day', data=tips, orient='h')
 
 
 # In[ ]:
 
 
-reshaped = melted.pivot('key', 'variable', 'value')
-reshaped
+plt.close('all')
 
 
 # In[ ]:
 
 
-reshaped.reset_index()
+sns.barplot(x='tip_pct', y='day', hue='time', data=tips, orient='h')
 
 
 # In[ ]:
 
 
-pd.melt(df, id_vars=['key'], value_vars=['A', 'B'])
+plt.close('all')
 
 
 # In[ ]:
 
 
-pd.melt(df, value_vars=['A', 'B', 'C'])
-pd.melt(df, value_vars=['key', 'A', 'B'])
+sns.set(style="whitegrid")
+
+
+# ### Histograms and Density Plots
+
+# In[ ]:
+
+
+plt.figure()
+
+
+# In[ ]:
+
+
+tips['tip_pct'].plot.hist(bins=50)
+
+
+# In[ ]:
+
+
+plt.figure()
+
+
+# In[ ]:
+
+
+tips['tip_pct'].plot.density()
+
+
+# In[ ]:
+
+
+plt.figure()
+
+
+# In[ ]:
+
+
+comp1 = np.random.normal(0, 1, size=200)
+comp2 = np.random.normal(10, 2, size=200)
+values = pd.Series(np.concatenate([comp1, comp2]))
+sns.distplot(values, bins=100, color='k')
+
+
+# ### Scatter or Point Plots
+
+# In[ ]:
+
+
+macro = pd.read_csv('examples/macrodata.csv')
+data = macro[['cpi', 'm1', 'tbilrate', 'unemp']]
+trans_data = np.log(data).diff().dropna()
+trans_data[-5:]
+
+
+# In[ ]:
+
+
+plt.figure()
+
+
+# In[ ]:
+
+
+sns.regplot('m1', 'unemp', data=trans_data)
+plt.title('Changes in log %s versus log %s' % ('m1', 'unemp'))
+
+
+# In[ ]:
+
+
+sns.pairplot(trans_data, diag_kind='kde', plot_kws={'alpha': 0.2})
+
+
+# ### Facet Grids and Categorical Data
+
+# In[ ]:
+
+
+sns.factorplot(x='day', y='tip_pct', hue='time', col='smoker',
+               kind='bar', data=tips[tips.tip_pct < 1])
+
+
+# In[ ]:
+
+
+sns.factorplot(x='day', y='tip_pct', row='time',
+               col='smoker',
+               kind='bar', data=tips[tips.tip_pct < 1])
+
+
+# In[ ]:
+
+
+sns.factorplot(x='tip_pct', y='day', kind='box',
+               data=tips[tips.tip_pct < 0.5])
+
+
+# ## Other Python Visualization Tools
+
+# In[ ]:
+
+
+pd.options.display.max_rows = PREVIOUS_MAX_ROWS
 
 
 # ## Conclusion
