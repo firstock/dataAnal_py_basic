@@ -21,4 +21,4 @@
 
 중급 | 자연어 | [pdf](https://goo.gl/tczXTQ) | code_ [감정분석](https://github.com/firstock/dataAnal_py_basic/tree/master/dss_sentimentMovie) [범죄도시, xgboost](https://github.com/firstock/dataAnal_py_basic/tree/master/dss_xgBoost)
 
-중급 | 크롤링 | [pdf](https://goo.gl/z5FpDB) | code_ [크롤링~DB](https://github.com/firstock/crawlingTaca)
+중급 | 크롤링 | [pdf](https://goo.gl/z5FpDB) [인강](https://youtu.be/TWb4xTwR0I8) | code_ [크롤링~DB](https://github.com/firstock/crawlingTaca)
